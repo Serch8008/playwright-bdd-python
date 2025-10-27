@@ -1,3 +1,5 @@
 behave
 playwright
 python-dotenv
+requests
+
