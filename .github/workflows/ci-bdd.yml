@@ -3,6 +3,7 @@ name: BDD Playwright (Behave)
 on:
   push:
   pull_request:
+  workflow_dispatch:
 
 jobs:
   test:
@@ -12,18 +13,27 @@ jobs:
         browser: [chromium, firefox, webkit]
     steps:
       - uses: actions/checkout@v4
+
       - uses: actions/setup-python@v5
         with:
           python-version: '3.11'
-      - run: python -m pip install --upgrade pip
-      - run: pip install behave playwright python-dotenv
-      - run: playwright install --with-deps
+
+      - name: Install deps
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          playwright install --with-deps
+
       - name: Run Behave
         env:
           BROWSER: ${{ matrix.browser }}
           HEADLESS: "true"
-        run: behave -f pretty -f json -o reports/report.json
-      - name: Upload artifacts (reports + traces)
+          PYTHONPATH: .          # 👈 para que encuentre api_client.py
+        run: |
+          mkdir -p reports
+          behave -f pretty -f json -o reports/report.json
+
+      - name: Upload artifacts (reports)
         uses: actions/upload-artifact@v4
         with:
           name: behave-${{ matrix.browser }}

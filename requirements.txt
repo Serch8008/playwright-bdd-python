@@ -2,4 +2,5 @@ behave
 playwright
 python-dotenv
 requests
+pytest
 
